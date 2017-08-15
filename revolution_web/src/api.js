@@ -1,4 +1,4 @@
-import fetch from 'whatwg-fetch'
+import 'whatwg-fetch'
 
 const checkStatus = response => {
     if (response.status >= 200 && response.status < 300) {
@@ -9,6 +9,8 @@ const checkStatus = response => {
         throw error;
     }
 };
+
+const notLoggedIn = () => Promise.reject(new Error('You are not logged in. Connect via Twitter, and make your voice heard!'));
 
 const parseJSON = response => response.json();
 
@@ -23,21 +25,59 @@ export default class Api {
      * @returns {Promise}
      */
     createCallToAction(data) {
-        return new Promise((resolve, reject) => {
-            if (!this.authToken.length)
-                return reject(new Error('You are not logged in.'));
+        if (!this.authToken.length)
+            return notLoggedIn();
 
-            return fetch('/api/cta', {
-                body: JSON.stringify(data),
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${this.authToken}`,
-                    'Content-Type': 'application/json'
-                },
-            })
-                .then(checkStatus)
-                .then(parseJSON)
-                .catch(reject);
-        });
+        return fetch('/api/cta', {
+            body: JSON.stringify(data),
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${this.authToken}`,
+                'Content-Type': 'application/json',
+                'X-HTTP-Method-Override': 'POST'
+            },
+        })
+            .then(checkStatus)
+            .then(parseJSON);
+    }
+
+    /**
+     * @returns {Promise}
+     */
+    fetchCta() {
+        if (!this.authToken.length)
+            return notLoggedIn();
+
+        return fetch('/api/cta', {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${this.authToken}`
+            }
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+    }
+
+    /**
+     *
+     * @param jwt {string}
+     * @returns {Promise}
+     */
+    revive(jwt) {
+        return fetch('/auth/token', {
+            body: JSON.stringify({}),
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${jwt}`,
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(checkStatus)
+            .then(parseJSON)
+            .then(response => {
+                window.localStorage.setItem('token', this.authToken = jwt);
+                console.info(response.data);
+                return response.data;
+            });
     }
 }

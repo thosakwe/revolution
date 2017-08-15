@@ -67,6 +67,11 @@ const mapStateToProps = state => {
 };
 
 const dispatchToProps = dispatch => {
+    dispatch({
+        value: 'Calls to Action',
+        type: 'revolution_app::title'
+    });
+
     return {
         closeDialog: () => {
             dispatch({
@@ -85,9 +90,15 @@ const dispatchToProps = dispatch => {
 
             api.createCallToAction(data).then(cta => {
                 // TODO: Insert CTA, should also reset dialog
+                console.info(cta);
             }).catch(e => {
-                // TODO: Display error globally
-                console.error(e);
+                dispatch({
+                    type: 'cta_dialog::close'
+                });
+                dispatch({
+                    error: e.message || 'Couldn\'t perform that action right now. Don\'t worry - we\'re already fixing it!',
+                    type: 'revolution_app::error'
+                });
             });
         },
         openDialog: () => {

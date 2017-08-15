@@ -8,6 +8,7 @@
       <excludeFolder url="file://$MODULE_DIR$/revolution_server/build" />
       <excludeFolder url="file://$MODULE_DIR$/revolution_server/packages" />
       <excludeFolder url="file://$MODULE_DIR$/revolution_server/test/packages" />
+      <excludeFolder url="file://$MODULE_DIR$/revolution_server/tool/packages" />
       <excludeFolder url="file://$MODULE_DIR$/revolution_server/web/images/packages" />
       <excludeFolder url="file://$MODULE_DIR$/revolution_server/web/packages" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />

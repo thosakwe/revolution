@@ -1,13 +1,19 @@
 library revolution_server;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:angel_common/angel_common.dart';
 import 'package:mock_request/mock_request.dart';
+import 'package:mongo_dart/mongo_dart.dart';
+import 'src/services/services.dart' as services;
+import 'src/auth.dart' as auth;
 
 /// Generates and configures an Angel server.
 Future<Angel> createServer() async {
-  var app = new Angel()..lazyParseBodies = true;
+  var app = new Angel()
+    ..injectSerializer(JSON.encode)
+    ..lazyParseBodies = true;
 
   // Loads app configuration from 'config/'.
   // It supports loading from YAML files, and also supports loading a `.env` file.
@@ -15,8 +21,11 @@ Future<Angel> createServer() async {
   // https://github.com/angel-dart/configuration
   await app.configure(loadConfigurationFile());
 
-  // All loaded configuration will be added to `app.properties`.
-  print('Loaded configuration: ${app.properties}');
+  var db = new Db(app.properties['mongo_db']);
+  await db.open();
+
+  await app.configure(services.configureServer(db));
+  await app.configure(auth.configureServer());
 
   // Sets up a static server (with caching support).
   // Defaults to serving out of 'web/'.
@@ -62,7 +71,8 @@ Future<Angel> createServer() async {
 
   // Enable GZIP and DEFLATE compression (conserves bandwidth)
   // https://github.com/angel-dart/compress
-  app.responseFinalizers.add(gzip());
+  if (app.isProduction)
+    app.responseFinalizers.add(gzip());
 
   // Logs requests and errors to both console, and a file named `log.txt`.
   // https://github.com/angel-dart/diagnostics

@@ -19,7 +19,7 @@ export default ({
     const _handleSubmit = () => {
         if (companyName.length && message.length) {
             onSubmit({
-                companyName,
+                company_name: companyName,
                 message,
             });
         } else {

@@ -3,10 +3,18 @@ homepage: "https://github.com/angel-dart/angel"
 name: "revolution_server"
 publish_to: "none"
 dependencies: 
+  angel_auth_twitter: "^1.0.0"
   angel_common: "^1.0.0"
+  angel_framework: "^1.0.0"
+  angel_model: "^1.0.0"
+  angel_mongo: "^1.0.0"
+  angel_security: "^1.0.0"
+  angel_serialize: "^1.0.0-alpha"
 dev_dependencies: 
   angel_hot: "^1.0.0"
+  angel_serialize_generator: "^1.0.0-alpha"
   angel_test: "^1.0.0"
+  build_runner: "^0.3.0"
   test: "^0.12.0"
 environment: 
   sdk: ">=1.19.0"

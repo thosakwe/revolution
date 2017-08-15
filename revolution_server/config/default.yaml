@@ -2,3 +2,8 @@
 debug: true
 foo: $FOO # Key from environment
 jwt_secret: "0NPH1H4FHWAORV318C7H3ROV3I013NO1"
+mongo_db: mongodb://localhost:27017/revolutionizr
+twitter:
+  key: h3uvRpAzNQ7VL7808fmhQyDmA
+  secret: KtjztMdHq9xlnx4VwLtSueLNUKYoss0XRcAYyFmogQ69lIxYK2
+  callback: http://localhost:8080/auth/twitter/callback
