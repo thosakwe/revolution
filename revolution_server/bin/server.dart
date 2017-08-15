@@ -11,7 +11,7 @@ main() async {
     // In production, we don't want to hot-reload the server.
     // Let's start it like normal here.
     var app = await createServer();
-    server = await app.startServer(host, port);
+    server = await app.startServer(host, 8080);
   } else {
     // In development, let's use hot-reloading on our server,
     // so that we don't have to constantly restart it. The HotReloader

@@ -9,6 +9,8 @@ export default (state = defaultState, action) => {
             return {...state, open: true};
         case 'cta_dialog::close':
             return {...state, open: false, sending: false};
+        case 'cta_dialog::reset':
+            return defaultState;
         case 'cta_dialog::sending':
             return {...state, sending: true};
         case 'cta_dialog::set_company_name':

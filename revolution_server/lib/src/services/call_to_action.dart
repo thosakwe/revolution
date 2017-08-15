@@ -17,22 +17,27 @@ AngelConfigurer configureServer(Db db) {
 
     var service = app.service('api/cta') as HookedService;
 
-    service.before([
-      HookedServiceEvent.modified,
-      HookedServiceEvent.removed,
-    ], auth.restrictToOwner(ownerField: 'user_id'));
+    service.before(
+      [HookedServiceEvent.modified, HookedServiceEvent.removed],
+      auth.restrictToOwner(ownerField: 'user_id'),
+    );
 
     service.beforeCreated.listen(hooks.chainListeners([
       auth.restrictToAuthenticated(),
       validateEvent(ctaValidator),
       auth.associateCurrentUser(ownerField: 'user_id'),
-      hooks.addCreatedAt(key: 'created_at', serialize: false),
+      hooks.addCreatedAt(key: 'created_at'),
+          (HookedServiceEvent e) {
+        print('Hello!!! ${e.data}');
+      }
     ]));
 
     service.beforeModify(
-      hooks.addUpdatedAt(key: 'updated_at', serialize: false),
+      hooks.addUpdatedAt(key: 'updated_at'),
     );
 
-    service.beforeUpdated.listen(hooks.disable());
+    service.beforeUpdated.listen(
+      hooks.disable(),
+    );
   };
 }

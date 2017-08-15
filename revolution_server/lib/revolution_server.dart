@@ -32,33 +32,42 @@ Future<Angel> createServer() async {
   // In production mode, it'll try to serve out of `build/web/`.
   //
   // https://github.com/angel-dart/static
-  await app.configure(new CachingVirtualDirectory());
+  if (app.isProduction) {
+    await app.configure(
+      new CachingVirtualDirectory(
+        source: new Directory('../revolution_web'),
+      ),
+    );
+  }
 
   // Routes in `app.after` will only run if the request was not terminated by a prior handler.
   // Usually, this is a situation in which you'll want to throw a 404 error.
   // On 404's, let's redirect the user to a pretty error page.
-  app.after.add((RequestContext req, ResponseContext res) async {
-    // Push state...
-    if (!req.accepts(ContentType.HTML) ||
-        req.uri.path.endsWith('.js') ||
-        req.uri.path.endsWith('.index.html')) return true;
+  if (app.isProduction) {
+    app.after.add((RequestContext req, ResponseContext res) async {
+      // Push state...
+      if (!req.accepts(ContentType.HTML) ||
+          req.uri.path.endsWith('.js') ||
+          req.uri.path.endsWith('.index.html')) return true;
 
-    var rq = new MockHttpRequest('GET', Uri.parse('index.html'));
-    rq.close();
-    var rs = rq.response;
-    copyHeaders(req.io.headers, rq.headers);
-    await app.handleRequest(rq);
+      print('Forward ${req.uri} => index.html (push-state)');
+      var rq = new MockHttpRequest('GET', Uri.parse('index.html'));
+      rq.close();
+      var rs = rq.response;
+      copyHeaders(req.io.headers, rq.headers);
+      await app.handleRequest(rq);
 
-    res.io
-      ..statusCode = rs.statusCode
-      ..headers.contentType = rs.headers.contentType;
-    copyHeaders(rs.headers, res.io.headers);
-    res
-      ..willCloseItself = true
-      ..end();
-    await rs.pipe(res.io);
-    return false;
-  });
+      res.io
+        ..statusCode = rs.statusCode
+        ..headers.contentType = rs.headers.contentType;
+      copyHeaders(rs.headers, res.io.headers);
+      res
+        ..willCloseItself = true
+        ..end();
+      await rs.pipe(res.io);
+      return false;
+    });
+  }
 
   app.after.add((RequestContext req, ResponseContext res) async {
     // Any other request should receive a 404
@@ -71,8 +80,8 @@ Future<Angel> createServer() async {
 
   // Enable GZIP and DEFLATE compression (conserves bandwidth)
   // https://github.com/angel-dart/compress
-  if (app.isProduction)
-    app.responseFinalizers.add(gzip());
+  // TODO: Resolve malformed GZIP bug
+  if (app.isProduction && false) app.responseFinalizers.add(gzip());
 
   // Logs requests and errors to both console, and a file named `log.txt`.
   // https://github.com/angel-dart/diagnostics

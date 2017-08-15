@@ -2,4 +2,4 @@
 #
 # This YAML will be merged with what is found in default.yaml, so no need to redefine shared config
 debug: false
-jwt_secret: "24028xmY46g2wj4382RyK4P5637LO4IX"
+# jwt_secret: "24028xmY46g2wj4382RyK4P5637LO4IX"

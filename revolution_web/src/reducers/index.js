@@ -20,8 +20,10 @@ const revolutionApp = (state = defaultState, action) => {
         case 'revolution_app::error':
             console.error(action.error);
             return {...state, error: action.error};
-        case 'revolution_app::error_dimiss':
+        case 'revolution_app::error_dismiss':
             return {...state, error: ''};
+        case 'revolution_app::push_cta':
+            return {...state, cta: state.cta.concat(action.value)};
         case 'revolution_app::title':
             document.title = `${action.value} - Revolution`;
             return {...state, title: action.value};

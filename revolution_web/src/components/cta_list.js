@@ -1,7 +1,10 @@
+import {Card, CardHeader, CardText} from 'material-ui/Card';
 import Dialog from 'material-ui/Dialog';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import FontIcon from 'material-ui/FontIcon';
 import LinearProgress from 'material-ui/LinearProgress';
+import List from 'material-ui/List';
+import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
 import CTADialog from './cta_dialog';
@@ -50,6 +53,16 @@ const CTAList = ({
                 setMessage={setMessage}
                 snackbarOpen={snackbarOpen}
             />
+            <List>
+                {cta.map(c => {
+                    return (
+                        <Card>
+                            <CardHeader subtitle={moment(c.created_at)} title={c.company_name}/>
+                            <CardText>{c.message}</CardText>
+                        </Card>
+                    );
+                })}
+            </List>
         </div>
     );
 };
@@ -89,8 +102,14 @@ const dispatchToProps = dispatch => {
             });
 
             api.createCallToAction(data).then(cta => {
-                // TODO: Insert CTA, should also reset dialog
                 console.info(cta);
+                dispatch({
+                    type: 'revolution_app::push_cta',
+                    value: cta,
+                });
+                dispatch({
+                    type: 'cta_dialog::reset'
+                });
             }).catch(e => {
                 dispatch({
                     type: 'cta_dialog::close'
