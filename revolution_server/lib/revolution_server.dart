@@ -36,6 +36,8 @@ Future<Angel> createServer() async {
     await app.configure(
       new CachingVirtualDirectory(
         source: new Directory('../revolution_web'),
+        // Disable cache expiry... Might be dangerous!
+        maxAge: null,
       ),
     );
   }
@@ -57,14 +59,15 @@ Future<Angel> createServer() async {
       copyHeaders(req.io.headers, rq.headers);
       await app.handleRequest(rq);
 
-      res.io
-        ..statusCode = rs.statusCode
-        ..headers.contentType = rs.headers.contentType;
-      copyHeaders(rs.headers, res.io.headers);
       res
-        ..willCloseItself = true
-        ..end();
-      await rs.pipe(res.io);
+        ..statusCode = rs.statusCode
+        ..contentType = rs.headers.contentType;
+
+      rs.headers.forEach((k, v) {
+        res.headers[k] = v.join(', ');
+      });
+
+      await rs.pipe(res);
       return false;
     });
   }
@@ -80,8 +83,10 @@ Future<Angel> createServer() async {
 
   // Enable GZIP and DEFLATE compression (conserves bandwidth)
   // https://github.com/angel-dart/compress
-  // TODO: Resolve malformed GZIP bug
-  if (app.isProduction && false) app.responseFinalizers.add(gzip());
+  app.injectEncoders({
+    'gzip': GZIP.encoder,
+    'deflate': ZLIB.encoder,
+  });
 
   // Logs requests and errors to both console, and a file named `log.txt`.
   // https://github.com/angel-dart/diagnostics
