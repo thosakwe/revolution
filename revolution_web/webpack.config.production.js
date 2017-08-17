@@ -28,6 +28,9 @@ module.exports = {
     },
 
     plugins: [
+        new webpack.DefinePlugin({
+            WS_URL: JSON.stringify('wss://revolutionizr.com/ws')
+        }),
         new webpack.optimize.UglifyJsPlugin({
             sourceMap: true,
             comments: false

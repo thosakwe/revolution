@@ -45,6 +45,10 @@ module.exports = {
     },
 
     plugins: [
+        new webpack.DefinePlugin({
+            WS_URL: JSON.stringify('ws://localhost:3000/ws')
+        }),
+
         new webpack.HotModuleReplacementPlugin(),
         // enable HMR globally
 

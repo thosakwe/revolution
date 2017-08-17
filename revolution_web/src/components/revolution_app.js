@@ -10,16 +10,77 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Link} from 'react-router';
 
-const RevolutionApp = ({api, children, dismissError, drawerOpen, error, setDrawer, setError, setUser, title, user}) => {
+const RevolutionApp = ({
+                           api, children, dismissError, dispatch, drawerOpen, error, title, user, websocket,
+                           setDrawer, setError, setUser, setWebsocket
+                       }) => {
+    const _applyJwt = (jwt) => {
+        return api.revive(jwt, websocket)
+            .then(setUser)
+            .then(() => {
+                return api.fetchSecureData(dispatch);
+            });
+    };
+
     const _startAuth = () => {
         window.addEventListener('token', (e) => {
-            const jwt = e.detail;
-            api.revive(jwt).then(setUser).catch(e => {
+            return _applyJwt(e.detail).catch(e => {
                 setError(e.message);
             });
         }, false);
-        const wnd = window.open('/auth/twitter');
+        window.open('/auth/twitter');
     };
+
+    if (!user && window.localStorage['token']) {
+        _applyJwt(window.localStorage['token']).catch(() => {
+            window.localStorage.removeItem('token');
+        });
+    } else if (!websocket) {
+        /*
+         this.fetchCta().then(value => {
+         dispatch({
+         value,
+         type: 'revolution_app::push_cta'
+         });
+         }),
+         */
+        // TODO: Figure out how to make secure WebSockets in production
+        const ws = new WebSocket(WS_URL);
+
+        ws.onerror = e => {
+            setError(e.message);
+        };
+
+        ws.onopen = () => {
+            setWebsocket(ws);
+
+            ws.onmessage = e => {
+                const msg = JSON.parse(e.data);
+
+                switch (msg.eventName) {
+                    case 'api/cta::indexed':
+                    case 'api/cta::created':
+                        dispatch({
+                            type: 'revolution_app::push_cta',
+                            value: msg.data,
+                        });
+                        break;
+                }
+            };
+
+            if (ws.readyState !== 1) {
+                dispatch({
+                    type: 'revolution_app::websocket_error',
+                    value: 'Could not connect to real-time server.'
+                });
+                return;
+            }
+
+            ws.send(JSON.stringify({
+                eventName: 'api/cta::index'
+            }));
+        }
+    }
 
     const actions = [
         <FlatButton label="Dismiss" onTouchTap={dismissError} primary={true}/>
@@ -53,6 +114,11 @@ const RevolutionApp = ({api, children, dismissError, drawerOpen, error, setDrawe
                 <ListItem
                     leftAvatar={<Avatar src={user.avatar}/>}
                     primaryText="My Actions"/>
+                <Link to="/settings" style={{textDecoration: 'none'}}>
+                    <ListItem
+                        leftIcon={<FontIcon className="material-icons">settings</FontIcon>}
+                        primaryText="Account Settings"/>
+                </Link>
             </List>
         );
     }
@@ -68,8 +134,6 @@ const RevolutionApp = ({api, children, dismissError, drawerOpen, error, setDrawe
                     style={drawerHeaderStyle}
                     title={user ? `@${user.name}` : 'Revolution'}
                     titleStyle={{position: 'absolute', bottom: '0', marginLeft: '-0.5em'}}/>
-                {userSection}
-                <Divider/>
                 <List>
                     <Link style={linkStyle} to="/">
                         <ListItem
@@ -77,6 +141,8 @@ const RevolutionApp = ({api, children, dismissError, drawerOpen, error, setDrawe
                             primaryText="Get Involved"/>
                     </Link>
                 </List>
+                <Divider/>
+                {userSection}
             </Drawer>
             <AppBar onLeftIconButtonTouchTap={() => setDrawer(true)} title={title}/>
             <Dialog actions={actions} modal={true} open={error.length > 0} title="Whoops! That didn't go as planned.">
@@ -95,11 +161,13 @@ const mapStateToProps = (state, ownProps) => {
         error: state.revolutionApp.error,
         title: state.revolutionApp.title,
         user: state.revolutionApp.user,
+        websocket: state.revolutionApp.websocket,
     };
 };
 
 const dispatchToProps = dispatch => {
     return {
+        dispatch,
         dismissError: () => {
             dispatch({
                 type: 'revolution_app::error_dismiss'
@@ -122,6 +190,12 @@ const dispatchToProps = dispatch => {
                 value,
                 type: 'revolution_app::user'
             });
+        },
+        setWebsocket: value => {
+            dispatch({
+                value,
+                type: 'revolution_app::websocket'
+            })
         }
     };
 };

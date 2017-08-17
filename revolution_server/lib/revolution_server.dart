@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:angel_common/angel_common.dart';
+import 'package:angel_websocket/server.dart';
 import 'package:mock_request/mock_request.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'src/services/services.dart' as services;
@@ -23,6 +24,9 @@ Future<Angel> createServer() async {
 
   var db = new Db(app.properties['mongo_db']);
   await db.open();
+
+  if (!app.isProduction)
+    app.before.add(cors());
 
   await app.configure(services.configureServer(db));
   await app.configure(auth.configureServer());
@@ -87,6 +91,10 @@ Future<Angel> createServer() async {
     'gzip': GZIP.encoder,
     'deflate': ZLIB.encoder,
   });
+
+  // Instant WebSockets
+  // TODO: Attach doNotBroadcast hooks...
+  await app.configure(new AngelWebSocket());
 
   // Logs requests and errors to both console, and a file named `log.txt`.
   // https://github.com/angel-dart/diagnostics

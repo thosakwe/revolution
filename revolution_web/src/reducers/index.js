@@ -1,13 +1,14 @@
 import Api from '../api';
 import ctaDialog from './cta_dialog';
 
-export const defaultState = {
+const defaultState = {
     // Global
-    api: null,
+    api: new Api(),
     drawerOpen: false,
     error: '',
-    title: 'Revolution',
+    title: 'Revolutionizr',
     user: null,
+    websocket: null,
 
     // Data
     cta: [],
@@ -23,13 +24,30 @@ const revolutionApp = (state = defaultState, action) => {
         case 'revolution_app::error_dismiss':
             return {...state, error: ''};
         case 'revolution_app::push_cta':
-            return {...state, cta: state.cta.concat(action.value)};
+            if (Array.isArray(action.value)) {
+                return {...state, cta: action.value.concat(state.cta)};
+            }
+
+            return {...state, cta: [action.value, ...state.cta]};
         case 'revolution_app::title':
             document.title = `${action.value} - Revolution`;
             return {...state, title: action.value};
         case 'revolution_app::user':
             return {...state, user: action.value};
+        case 'revolution_app::websocket':
+            if (state.websocket) {
+                if (action.value.readyState === 0 || action.value.readyState === 1)
+                    action.value.close();
+                return state;
+            }
+
+            return {...state, websocket: action.value};
+        case 'revolution_app::websocket_error':
+            if (state.websocket !== null) return state;
+            //console.info(state);
+            return {...state, error: action.value};
         default:
+            //console.warn(`Unknown action type: ${action.type}`);
             return state;
     }
 };

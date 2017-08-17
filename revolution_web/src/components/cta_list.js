@@ -7,6 +7,7 @@ import List from 'material-ui/List';
 import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
+import {Link} from 'react-router';
 import CTADialog from './cta_dialog';
 
 const CTAList = ({
@@ -53,13 +54,16 @@ const CTAList = ({
                 setMessage={setMessage}
                 snackbarOpen={snackbarOpen}
             />
-            <List>
+            <List style={{padding: '1em'}}>
                 {cta.map(c => {
                     return (
-                        <Card>
-                            <CardHeader subtitle={moment(c.created_at)} title={c.company_name}/>
-                            <CardText>{c.message}</CardText>
-                        </Card>
+                        <Link key={c.id}  to={`/cta/${c.id}`} style={{textDecoration: 'none'}}>
+                            <Card style={{marginBottom: '1em'}}>
+                                <CardHeader subtitle={moment(c.created_at).format('MMMM Do YYYY')}
+                                            title={c.company_name}/>
+                                <CardText>{c.message}</CardText>
+                            </Card>
+                        </Link>
                     );
                 })}
             </List>

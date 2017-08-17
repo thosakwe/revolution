@@ -42,6 +42,16 @@ export default class Api {
     }
 
     /**
+     *
+     * @param dispatch {Function}
+     * @returns {Promise.<*>}
+     */
+    fetchSecureData(dispatch) {
+        return Promise.all([
+        ]);
+    }
+
+    /**
      * @returns {Promise}
      */
     fetchCta() {
@@ -61,9 +71,10 @@ export default class Api {
     /**
      *
      * @param jwt {string}
+     * @param websocket {WebSocket}
      * @returns {Promise}
      */
-    revive(jwt) {
+    revive(jwt, websocket) {
         return fetch('/auth/token', {
             body: JSON.stringify({}),
             method: 'POST',
@@ -77,6 +88,16 @@ export default class Api {
             .then(response => {
                 window.localStorage.setItem('token', this.authToken = jwt);
                 console.info(response.data);
+
+                if (websocket) {
+                    websocket.send(JSON.stringify({
+                        eventName: 'authenticate',
+                        params: {
+                            query: jwt
+                        }
+                    }));
+                }
+
                 return response.data;
             });
     }

@@ -23,13 +23,13 @@ AngelConfigurer configureServer(Db db) {
     );
 
     service.beforeCreated.listen(hooks.chainListeners([
+      (HookedServiceEvent e) {
+        if (e.data is! Map) throw new AngelHttpException.badRequest();
+      },
       auth.restrictToAuthenticated(),
       validateEvent(ctaValidator),
       auth.associateCurrentUser(ownerField: 'user_id'),
       hooks.addCreatedAt(key: 'created_at'),
-          (HookedServiceEvent e) {
-        print('Hello!!! ${e.data}');
-      }
     ]));
 
     service.beforeModify(
@@ -39,5 +39,12 @@ AngelConfigurer configureServer(Db db) {
     service.beforeUpdated.listen(
       hooks.disable(),
     );
+
+    service.afterIndexed.listen((HookedServiceEvent e) {
+      e.result.sort((Map a, Map b) {
+        var aa = DateTime.parse(a['created_at']), bb = DateTime.parse(b['created_at']);
+        return bb.compareTo(aa);
+      });
+    });
   };
 }
