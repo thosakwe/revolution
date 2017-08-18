@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of revolution_server.src.models.call_to_action;
+part of revolution_server.src.models.upload;
 
 // **************************************************************************
 // Generator: JsonModelGenerator
-// Target: class _CallToAction
+// Target: class _Upload
 // **************************************************************************
 
-class CallToAction extends _CallToAction {
+class Upload extends _Upload {
   @override
   String id;
 
@@ -15,25 +15,10 @@ class CallToAction extends _CallToAction {
   String userId;
 
   @override
-  String companyName;
+  String mimeType;
 
   @override
-  String avatar;
-
-  @override
-  String email;
-
-  @override
-  String phoneNumber;
-
-  @override
-  String twitter;
-
-  @override
-  String facebook;
-
-  @override
-  String message;
+  String path;
 
   @override
   DateTime createdAt;
@@ -41,30 +26,20 @@ class CallToAction extends _CallToAction {
   @override
   DateTime updatedAt;
 
-  CallToAction(
+  Upload(
       {this.id,
       this.userId,
-      this.companyName,
-      this.avatar,
-      this.email,
-      this.phoneNumber,
-      this.twitter,
-      this.facebook,
-      this.message,
+      this.mimeType,
+      this.path,
       this.createdAt,
       this.updatedAt});
 
-  factory CallToAction.fromJson(Map data) {
-    return new CallToAction(
+  factory Upload.fromJson(Map data) {
+    return new Upload(
         id: data['id'],
         userId: data['user_id'],
-        companyName: data['company_name'],
-        avatar: data['avatar'],
-        email: data['email'],
-        phoneNumber: data['phone_number'],
-        twitter: data['twitter'],
-        facebook: data['facebook'],
-        message: data['message'],
+        mimeType: data['mime_type'],
+        path: data['path'],
         createdAt: data['created_at'] is DateTime
             ? data['created_at']
             : (data['created_at'] is String
@@ -80,20 +55,15 @@ class CallToAction extends _CallToAction {
   Map<String, dynamic> toJson() => {
         'id': id,
         'user_id': userId,
-        'company_name': companyName,
-        'avatar': avatar,
-        'email': email,
-        'phone_number': phoneNumber,
-        'twitter': twitter,
-        'facebook': facebook,
-        'message': message,
+        'mime_type': mimeType,
+        'path': path,
         'created_at': createdAt == null ? null : createdAt.toIso8601String(),
         'updated_at': updatedAt == null ? null : updatedAt.toIso8601String()
       };
 
-  static CallToAction parse(Map map) => new CallToAction.fromJson(map);
+  static Upload parse(Map map) => new Upload.fromJson(map);
 
-  CallToAction clone() {
-    return new CallToAction.fromJson(toJson());
+  Upload clone() {
+    return new Upload.fromJson(toJson());
   }
 }

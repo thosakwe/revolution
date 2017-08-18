@@ -59,7 +59,7 @@ const CTAList = ({
                     return (
                         <Link key={c.id}  to={`/cta/${c.id}`} style={{textDecoration: 'none'}}>
                             <Card style={{marginBottom: '1em'}}>
-                                <CardHeader subtitle={moment(c.created_at).format('MMMM Do YYYY')}
+                                <CardHeader subtitle={moment(c.created_at).format('MMMM Do, YYYY')}
                                             title={c.company_name}/>
                                 <CardText>{c.message}</CardText>
                             </Card>

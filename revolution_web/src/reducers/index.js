@@ -11,6 +11,7 @@ const defaultState = {
     websocket: null,
 
     // Data
+    comments: [],
     cta: [],
 };
 

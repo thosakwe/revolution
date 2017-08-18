@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of revolution_server.src.models.call_to_action;
+part of revolution_server.src.models.comment;
 
 // **************************************************************************
 // Generator: JsonModelGenerator
-// Target: class _CallToAction
+// Target: class _Comment
 // **************************************************************************
 
-class CallToAction extends _CallToAction {
+class Comment extends _Comment {
   @override
   String id;
 
@@ -15,25 +15,10 @@ class CallToAction extends _CallToAction {
   String userId;
 
   @override
-  String companyName;
+  String ctaId;
 
   @override
-  String avatar;
-
-  @override
-  String email;
-
-  @override
-  String phoneNumber;
-
-  @override
-  String twitter;
-
-  @override
-  String facebook;
-
-  @override
-  String message;
+  String text;
 
   @override
   DateTime createdAt;
@@ -41,30 +26,20 @@ class CallToAction extends _CallToAction {
   @override
   DateTime updatedAt;
 
-  CallToAction(
+  Comment(
       {this.id,
       this.userId,
-      this.companyName,
-      this.avatar,
-      this.email,
-      this.phoneNumber,
-      this.twitter,
-      this.facebook,
-      this.message,
+      this.ctaId,
+      this.text,
       this.createdAt,
       this.updatedAt});
 
-  factory CallToAction.fromJson(Map data) {
-    return new CallToAction(
+  factory Comment.fromJson(Map data) {
+    return new Comment(
         id: data['id'],
         userId: data['user_id'],
-        companyName: data['company_name'],
-        avatar: data['avatar'],
-        email: data['email'],
-        phoneNumber: data['phone_number'],
-        twitter: data['twitter'],
-        facebook: data['facebook'],
-        message: data['message'],
+        ctaId: data['cta_id'],
+        text: data['text'],
         createdAt: data['created_at'] is DateTime
             ? data['created_at']
             : (data['created_at'] is String
@@ -80,20 +55,15 @@ class CallToAction extends _CallToAction {
   Map<String, dynamic> toJson() => {
         'id': id,
         'user_id': userId,
-        'company_name': companyName,
-        'avatar': avatar,
-        'email': email,
-        'phone_number': phoneNumber,
-        'twitter': twitter,
-        'facebook': facebook,
-        'message': message,
+        'cta_id': ctaId,
+        'text': text,
         'created_at': createdAt == null ? null : createdAt.toIso8601String(),
         'updated_at': updatedAt == null ? null : updatedAt.toIso8601String()
       };
 
-  static CallToAction parse(Map map) => new CallToAction.fromJson(map);
+  static Comment parse(Map map) => new Comment.fromJson(map);
 
-  CallToAction clone() {
-    return new CallToAction.fromJson(toJson());
+  Comment clone() {
+    return new Comment.fromJson(toJson());
   }
 }

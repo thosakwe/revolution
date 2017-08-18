@@ -7,9 +7,8 @@ import {Provider} from 'react-redux';
 import {IndexRoute, Router, Route, browserHistory} from 'react-router';
 import {syncHistoryWithStore, routerReducer} from 'react-router-redux';
 import {createStore, combineReducers} from 'redux';
-import Api from './api';
 import Components from './components';
-import revolutionApp, {defaultState} from './reducers';
+import revolutionApp from './reducers';
 
 injectTapEventPlugin();
 
@@ -31,6 +30,7 @@ const render = Component =>
                     <Router history={history}>
                         <Route path="/" component={Component}>
                             <IndexRoute component={Components.CTAList}/>
+                            <Route path="/cta/:id" component={Components.CTADetail}/>
                         </Route>
                     </Router>
                 </Provider>

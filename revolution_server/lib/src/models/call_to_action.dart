@@ -6,4 +6,6 @@ import 'package:angel_serialize/angel_serialize.dart';
 part 'call_to_action.g.dart';
 
 @serializable
-class _CallToAction extends Model {}
+class _CallToAction extends Model {
+  String userId, companyName, avatar, email, phoneNumber, twitter, facebook, message;
+}

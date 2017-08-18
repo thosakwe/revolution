@@ -6,6 +6,7 @@ import 'package:angel_mongo/angel_mongo.dart';
 import 'package:angel_security/hooks.dart' as auth;
 import 'package:angel_validate/server.dart';
 import 'package:mongo_dart/mongo_dart.dart';
+import 'package:angel_relations/angel_relations.dart' as relations;
 
 final Validator ctaValidator = new Validator({
   'company_name*,message*': [isNonEmptyString]
@@ -16,6 +17,7 @@ AngelConfigurer configureServer(Db db) {
     app.use('/api/cta', new MongoService(db.collection('cta')));
 
     var service = app.service('api/cta') as HookedService;
+    app.inject('ctaService', service);
 
     service.before(
       [HookedServiceEvent.modified, HookedServiceEvent.removed],
@@ -42,9 +44,18 @@ AngelConfigurer configureServer(Db db) {
 
     service.afterIndexed.listen((HookedServiceEvent e) {
       e.result.sort((Map a, Map b) {
-        var aa = DateTime.parse(a['created_at']), bb = DateTime.parse(b['created_at']);
+        var aa = DateTime.parse(a['created_at']),
+            bb = DateTime.parse(b['created_at']);
         return bb.compareTo(aa);
       });
     });
+
+    service.afterAll(
+      relations.belongsTo(
+        'api/users',
+        foreignKey: 'user_id',
+        as: 'user',
+      ),
+    );
   };
 }

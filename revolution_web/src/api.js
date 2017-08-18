@@ -55,9 +55,6 @@ export default class Api {
      * @returns {Promise}
      */
     fetchCta() {
-        if (!this.authToken.length)
-            return notLoggedIn();
-
         return fetch('/api/cta', {
             method: 'GET',
             headers: {
@@ -66,6 +63,14 @@ export default class Api {
         })
             .then(checkStatus)
             .then(parseJSON)
+    }
+
+    fetchCtaById(id, websocket) {
+        console.info(`Fetching CTA #${id}`);
+        websocket.send({
+            id,
+            eventName: 'api/cta::read'
+        });
     }
 
     /**

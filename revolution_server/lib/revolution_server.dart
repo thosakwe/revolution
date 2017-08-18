@@ -9,6 +9,7 @@ import 'package:mock_request/mock_request.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 import 'src/services/services.dart' as services;
 import 'src/auth.dart' as auth;
+import 'src/upload.dart' as upload;
 
 /// Generates and configures an Angel server.
 Future<Angel> createServer() async {
@@ -30,6 +31,10 @@ Future<Angel> createServer() async {
 
   await app.configure(services.configureServer(db));
   await app.configure(auth.configureServer());
+
+  var uploadsDir = new Directory('uploads');
+  if (!await uploadsDir.exists()) await uploadsDir.create(recursive: true);
+  await upload.configureServer(uploadsDir);
 
   // Sets up a static server (with caching support).
   // Defaults to serving out of 'web/'.
@@ -94,7 +99,7 @@ Future<Angel> createServer() async {
 
   // Instant WebSockets
   // TODO: Attach doNotBroadcast hooks...
-  await app.configure(new AngelWebSocket());
+  await app.configure(new AngelWebSocket(debug: !app.isProduction));
 
   // Logs requests and errors to both console, and a file named `log.txt`.
   // https://github.com/angel-dart/diagnostics

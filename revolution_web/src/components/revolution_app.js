@@ -8,7 +8,7 @@ import FontIcon from 'material-ui/FontIcon';
 import {List, ListItem} from 'material-ui/List';
 import React from 'react';
 import {connect} from 'react-redux';
-import {Link} from 'react-router';
+import {browserHistory, Link} from 'react-router';
 
 const RevolutionApp = ({
                            api, children, dismissError, dispatch, drawerOpen, error, title, user, websocket,
@@ -60,6 +60,7 @@ const RevolutionApp = ({
                 switch (msg.eventName) {
                     case 'api/cta::indexed':
                     case 'api/cta::created':
+                    case 'api/cta::read':
                         dispatch({
                             type: 'revolution_app::push_cta',
                             value: msg.data,
@@ -166,6 +167,13 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const dispatchToProps = dispatch => {
+    browserHistory.listen(() => {
+        dispatch({
+            value: false,
+            type: 'revolution_app::drawer'
+        });
+    });
+
     return {
         dispatch,
         dismissError: () => {
