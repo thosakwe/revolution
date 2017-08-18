@@ -11,6 +11,7 @@ dependencies:
   angel_security: "^1.0.0"
   angel_serialize: "^1.0.0-alpha"
   angel_websocket: ^1.0.0
+  image: ^1.0.0
 dev_dependencies: 
   angel_hot: "^1.0.0"
   angel_serialize_generator: "^1.0.0-alpha"

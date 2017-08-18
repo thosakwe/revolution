@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:angel_file_security/angel_file_security.dart';
 import 'package:angel_framework/angel_framework.dart';
+import 'package:image/image.dart';
 import 'models/models.dart';
 
 AngelConfigurer configureServer(Directory uploadDir) {
@@ -29,17 +30,27 @@ AngelConfigurer configureServer(Directory uploadDir) {
         ],
       ),
     ]).post(
-      '/:ctaId/avatar',
-      (String ctaId, User user, Service ctaService, Service uploadService,
+      '/api/cta/:ctaId/avatar',
+          (User user, Service ctaService, Service uploadService,
           RequestContext req) async {
+        var ctaId = req.params['ctaId'];
         var cta = await ctaService.read(ctaId).then(CallToAction.parse);
 
         if (cta.userId != user.id) throw new AngelHttpException.forbidden();
 
         var uploadedFile =
-            req.files.firstWhere((f) => f.name == 'file', orElse: () => null);
+        req.files.firstWhere((f) => f.name == 'file', orElse: () => null);
 
         if (uploadedFile == null) throw new AngelHttpException.badRequest();
+
+        var img = decodeImage(uploadedFile.data);
+
+        if (img == null)
+          throw new AngelHttpException.badRequest(message: 'Invalid image.');
+
+        if (img.width > 500 || img.height > 500)
+          throw new AngelHttpException.badRequest(
+              message: 'Image exceeds the max dimensions of 500x500.');
 
         var upload = await uploadService.create({
           'user_id': user.id,

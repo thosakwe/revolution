@@ -106,4 +106,26 @@ export default class Api {
                 return response.data;
             });
     }
+
+    /**
+     *
+     * @param id
+     * @param file
+     * @returns {Promise}
+     */
+    upload(id, file) {
+        if (!this.authToken.length)
+            return notLoggedIn();
+
+        const data = new FormData();
+        data.append('file', file);
+
+        return fetch(`/api/cta/${id}/avatar`, {
+            method: 'POST',
+            body: data,
+            headers: {
+                Authorization: `Bearer ${this.authToken}`
+            }
+        });
+    }
 }

@@ -64,7 +64,7 @@ module.exports = {
 
         proxy: [
             {
-                context: ['/api/**', '/auth/**'],
+                context: ['/api/**', '/auth/**', '/upload/*'],
                 target: 'http://localhost:3000'
             }
         ]

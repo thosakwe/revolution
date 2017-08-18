@@ -34,7 +34,7 @@ Future<Angel> createServer() async {
 
   var uploadsDir = new Directory('uploads');
   if (!await uploadsDir.exists()) await uploadsDir.create(recursive: true);
-  await upload.configureServer(uploadsDir);
+  await app.configure(upload.configureServer(uploadsDir));
 
   // Sets up a static server (with caching support).
   // Defaults to serving out of 'web/'.
@@ -105,5 +105,6 @@ Future<Angel> createServer() async {
   // https://github.com/angel-dart/diagnostics
   await app.configure(logRequests(new File('log.txt')));
 
+  //app.dumpTree();
   return app;
 }

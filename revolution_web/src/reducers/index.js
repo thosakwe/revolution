@@ -1,4 +1,5 @@
 import Api from '../api';
+import avatarDialog from './avatar_dialog';
 import ctaDialog from './cta_dialog';
 
 const defaultState = {
@@ -17,6 +18,14 @@ const defaultState = {
 
 const revolutionApp = (state = defaultState, action) => {
     switch (action.type) {
+        case 'revolution_app::cta_avatar':
+            return {
+                ...state,
+                cta: state.cta.map(c => {
+                    if (c.id !== action.id) return c;
+                    return {...c, avatar: action.avatar};
+                })
+            };
         case 'revolution_app::drawer':
             return {...state, drawerOpen: action.value};
         case 'revolution_app::error':
@@ -53,4 +62,4 @@ const revolutionApp = (state = defaultState, action) => {
     }
 };
 
-export default {revolutionApp, ctaDialog};
+export default {revolutionApp, avatarDialog, ctaDialog};

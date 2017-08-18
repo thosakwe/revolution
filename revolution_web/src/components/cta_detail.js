@@ -9,8 +9,13 @@ import {Toolbar, ToolbarGroup, ToolbarTitle} from 'material-ui/Toolbar';
 import moment from 'moment';
 import React from 'react';
 import {connect} from 'react-redux';
+import AvatarDialog from './avatar_dialog';
 
-const CTADetail = ({api, cta, id, user, websocket, setTitle}) => {
+const CTADetail = ({
+                       api, cta, dialogOpen, files, id, sending, user, websocket,
+                       setAvatar, setError, setFiles, setOpen, setSending, setTitle
+                   }) => {
+
     if (!websocket || !cta) {
         if (websocket && !cta) {
             api.fetchCtaById(id, websocket);
@@ -43,6 +48,7 @@ const CTADetail = ({api, cta, id, user, websocket, setTitle}) => {
                             </IconButton>
                         }>
                         <MenuItem
+                            onTouchTap={() => setOpen(true)}
                             primaryText="Upload Cover Image..."
                             leftIcon={<FontIcon className="material-icons">camera_alt</FontIcon>}/>
                     </IconMenu>
@@ -57,7 +63,9 @@ const CTADetail = ({api, cta, id, user, websocket, setTitle}) => {
         titleComponent = (
             <CardMedia
                 overlay={<CardTitle title={`Calling out ${cta.company_name}`}/>}>
-                <img src={`/upload/${cta.avatar}`} alt={cta.company_name}/>
+                <img
+                    src={`/upload/${cta.avatar}`}
+                    alt={cta.company_name}/>
             </CardMedia>
         );
     } else {
@@ -68,6 +76,17 @@ const CTADetail = ({api, cta, id, user, websocket, setTitle}) => {
 
     return (
         <div>
+            <AvatarDialog
+                api={api}
+                files={files}
+                id={id}
+                onComplete={(avatar) => setAvatar(id, avatar)}
+                open={dialogOpen}
+                sending={sending}
+                setError={setError}
+                setFiles={setFiles}
+                setOpen={setOpen}
+                setSending={setSending}/>
             {toolbarComponent}
             <div style={{padding: '1em'}}>
                 <FloatingActionButton style={{position: 'fixed', bottom: '1em', right: '1em'}}>
@@ -101,6 +120,9 @@ const mapStateToProps = (state, ownProps) => {
         cta,
         id: ownProps.routeParams.id,
         api: state.revolutionApp.api,
+        dialogOpen: state.avatarDialog.open,
+        files: state.avatarDialog.files,
+        sending: state.avatarDialog.sending,
         websocket: state.revolutionApp.websocket,
         user: state.revolutionApp.user,
     };
@@ -108,6 +130,36 @@ const mapStateToProps = (state, ownProps) => {
 
 const dispatchToProps = dispatch => {
     return {
+        setAvatar: (id, avatar) => {
+            dispatch({
+                id, avatar,
+                type: 'revolution_app::cta_avatar'
+            });
+        },
+        setError: error => {
+            dispatch({
+                error,
+                type: 'revolution_app::error'
+            });
+        },
+        setFiles: value => {
+            dispatch({
+                value,
+                type: 'avatar_dialog::files'
+            });
+        },
+        setOpen: value => {
+            dispatch({
+                value,
+                type: 'avatar_dialog::open'
+            });
+        },
+        setSending: value => {
+            dispatch({
+                value,
+                type: 'avatar_dialog::sending'
+            });
+        },
         setTitle: value => {
             dispatch({
                 value,
